@@ -1,10 +1,14 @@
 import os
+from concurrent import futures
+
 from ftplib import FTP
 
 try:
     from credentials import *
 except ImportError:
     print('You must define a user and a password')
+
+MAX_WORKERS = 20
 
 
 class GPMFTP(FTP):
@@ -71,10 +75,17 @@ class GPMFTP(FTP):
             print('    ...downloaded')
 
     def grab_latest_nfiles(self, n, datadir):
-        for path in self.get_latest_nfnames(n):
-            self.grab_file(path, datadir)
+        paths = self.get_latest_nfnames(n)
+        if len(paths) < 3:
+            for path in paths:
+                self.grab_file(path, datadir)
+        else:
+            workers = min(MAX_WORKERS, len(paths))
+            datadirl = [datadir] * len(paths)
+            with futures.ThreadPoolExecutor(workers) as executor:
+                res = executor.map(self.grab_file, paths, datadirl)
 
 
 if __name__ == '__main__':
     with GPMFTP() as ftp:
-        ftp.grab_latest_nfiles(2, DATADIR)
+        ftp.grab_latest_nfiles(4, DATADIR)

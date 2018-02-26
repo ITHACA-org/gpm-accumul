@@ -3,3 +3,5 @@ docker build -t tributubuntu .
 docker run --name tribute_curr --volume=G:\progetti\ITHACA\tribute\gpm-accumul:/usr/src/gpm-accumul -p 80:8000 -it tributubuntu
 
 docker exec -it tribute_curr bash
+
+docker start -ai tribute_curr

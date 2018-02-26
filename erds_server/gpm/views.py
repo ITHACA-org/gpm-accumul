@@ -1,5 +1,7 @@
 from django.http import (HttpResponse, HttpResponseBadRequest, JsonResponse, HttpResponseServerError,
                          HttpResponseNotFound)
+from django.shortcuts import render
+from django.urls import reverse
 
 from gpm_repo.rain_chart import PrecipCalReader
 
@@ -30,4 +32,12 @@ def time_series(request, lon, lat, time_period_hours):
         return HttpResponseNotFound('{0} --> Lon: {1} | Lat: {2}'.format(str(e), lon, lat))
 
     rain_data_list = rain_data.tolist()
-    return JsonResponse({'precipitation in mm': rain_data_list})
+    return JsonResponse({'mm': rain_data_list})
+
+
+def time_series_chart(request, lon, lat, time_period_hours):
+    kw = {'lat': lat, 'lon': lon, 'time_period_hours': time_period_hours}
+    url = reverse('gpm:time_series', kwargs=kw)
+
+    context = {'json_url': url}
+    return render(request, 'gpm/chart.html', context)

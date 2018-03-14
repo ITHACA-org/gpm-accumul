@@ -19,7 +19,7 @@ TIFF_FFORMAT = 'precip_{:03d}h.tif'
 def mirror_gpm_site():
     # since the maximum cumulate is 144h, we need 288 files to build it
     print('Mirroring FTP site')
-    n_gpm_files = 288
+    n_gpm_files = 192
     with GPMFTP() as ftp:
         ftp.grab_latest_nfiles(n_gpm_files, DATADIR)
     # delete old files
@@ -74,28 +74,25 @@ def cumulate(hours):
 
 
 def generate_alerts():
-    cumulate_hours = [12, 24, 48, 72, 96, 120, 144]
+    cumulate_hours = [12, 24, 48, 72, 96]
     cumulate_hours.sort(reverse=True)
 
     # the first serie is built from scratch
     hours = cumulate_hours[0]
     print('Working on', str(hours), 'hours accumulation... ')
-    serie = cumulate(hours)
-    compare_precip(serie)
+    longest_serie = cumulate(hours)
+    compare_precip(longest_serie)
     # the other series are subserie of the previous
-    serie_72h = None
     for hours in cumulate_hours[1:]:
         print('Working on', str(hours), 'hours accumulation... ')
         duration = datetime.timedelta(hours=hours)
-        serie = serie.latest_subserie(duration)
+        serie = longest_serie.latest_subserie(duration)
         tif_abspath = os.path.join(DATADIR, TIFF_FFORMAT.format(hours))
         serie.save_accumul(tif_abspath)
         compare_precip(serie)
-        if hours == 72:
-            serie_72h = serie
 
     # filter precipitation on the basis of the alerts
-    pcb = PrecipCalBuilder(serie_72h)
+    pcb = PrecipCalBuilder(longest_serie)
     pcb.store_series()
     pcb.delete_old()
 

@@ -95,15 +95,23 @@ class GPMFTP(FTP):
             print('Downloading', fname, '...')
             self.retrbinary('RETR ' + path, localfile.write)
             print('    ...downloaded')
+        return fname
 
     def grab_latest_nfiles(self, n, datadir):
         count = 0
+        grabbed = []
         for path in self.get_latest_nfnames(n):
             count += 1
             print('GPM file number ' + str(count) + '/' + str(n))
-            self.grab_file(path, datadir)
+            res = self.grab_file(path, datadir)
+            if res is not None:
+                grabbed.append(res)
+        return grabbed
 
 
 if __name__ == '__main__':
     with GPMFTP() as ftp:
-        ftp.grab_latest_nfiles(26, DATADIR)
+        grabbed_files = ftp.grab_latest_nfiles(5, DATADIR)
+        print('Grabbed files are:')
+        for fname in grabbed_files:
+            print(fname)

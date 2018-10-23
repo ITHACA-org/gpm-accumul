@@ -50,8 +50,9 @@ class GPMImergeWrapper:
             with h5py.File(self.abspath, 'r') as f:
                 ds = f['/Grid/precipitationCal']
                 _precipCal = ds[:, 300:1500]
-        except OSError as e:
+        except OSError:
             print('Cannot read GPM file:', self.basename)
+            raise
 
         _precipCal[_precipCal == -9999.9] = 0
         return _precipCal
@@ -65,3 +66,11 @@ class GPMImergeWrapper:
                                                   self.EDTFORMAT)
         self.start_dt = naive_start_dt.replace(tzinfo=datetime.timezone.utc)
         self.end_dt = naive_end_dt.replace(tzinfo=datetime.timezone.utc)
+
+    @property
+    def is_corrupt(self):
+        try:
+            self.precipCal
+        except OSError:
+            return True
+        return False

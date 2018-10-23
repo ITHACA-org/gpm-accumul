@@ -21,7 +21,17 @@ def mirror_gpm_site():
     print('Mirroring FTP site')
     n_gpm_files = 192
     with GPMFTP() as ftp:
-        ftp.grab_latest_nfiles(n_gpm_files, DATADIR)
+        grabbed_files = ftp.grab_latest_nfiles(n_gpm_files, DATADIR)
+
+    # check/verify files
+    for fname in grabbed_files:
+        absfname = os.path.join(DATADIR, fname)
+        if gpm_wrapper.GPMImergeWrapper(absfname).is_corrupt:
+            try:
+                os.remove(absfname)
+            except OSError:
+                print('Cannot remove corrupt gpm file: ' + absfname)
+
     # delete old files
     gpm_filelist = glob.glob(os.path.join(DATADIR, GPM_FFORMAT))
     gpm_filelist.sort()

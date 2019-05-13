@@ -49,7 +49,10 @@ class GPMImergeWrapper:
         try:
             with h5py.File(self.abspath, 'r') as f:
                 ds = f['/Grid/precipitationCal']
-                _precipCal = ds[:, 300:1500]
+                if len(ds.shape) == 2:
+                    _precipCal = ds[:, 300:1500]
+                elif len(ds.shape) == 3:
+                    _precipCal = ds[0, :, 300:1500]
         except OSError:
             print('Cannot read GPM file:', self.basename)
             raise

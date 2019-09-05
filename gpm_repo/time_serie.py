@@ -146,7 +146,7 @@ class GridThreshold:
     @property
     def grid(self):
         if self._grid is None:
-            grid_toflip = tiff2array(self.grid_apath)[300:-300].T
+            grid_toflip = tiff2array(self.grid_apath).T
             self._grid = np.fliplr(grid_toflip)
         return self._grid
 
@@ -203,6 +203,5 @@ class AlertDetector:
         mask_filename = config['Files']['mask']
         mask_dirname = os.path.dirname(THRESHOLDS_ABSPATH)
         mask_abspath = os.path.join(mask_dirname, mask_filename)
-        global_mask = tiff2array(mask_abspath)
-        gpm_mask = global_mask[300:-300, :]
+        gpm_mask = tiff2array(mask_abspath)
         return np.fliplr(gpm_mask.T)

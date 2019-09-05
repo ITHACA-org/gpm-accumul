@@ -12,7 +12,7 @@ def array2tiff(array, out_abspath):
         raise ValueError("The array provided is not a valid numpy array")
     gdal.AllRegister()
     driver = gdal.GetDriverByName('Gtiff')
-    geotransform = (-180, 0.1, 0, -60, 0, 0.1)
+    geotransform = (-180, 0.1, 0, -90, 0, 0.1)
     outDataset_options = ['COMPRESS=LZW']
     dtype = gdal.GDT_Int16
     if array.dtype == np.float32:

@@ -30,7 +30,7 @@ class GPMImergeWrapper:
 
     @staticmethod
     def get_lat_index(lat):
-        lats = np.arange(-59.95, 60, 0.1)
+        lats = np.arange(-89.95, 90, 0.1)
         diffs = lat - lats
         abs_diffs = np.absolute(diffs)
         return abs_diffs.argmin()
@@ -50,9 +50,9 @@ class GPMImergeWrapper:
             with h5py.File(self.abspath, 'r') as f:
                 ds = f['/Grid/precipitationCal']
                 if len(ds.shape) == 2:
-                    _precipCal = ds[:, 300:1500]
+                    _precipCal = ds[:, :]
                 elif len(ds.shape) == 3:
-                    _precipCal = ds[0, :, 300:1500]
+                    _precipCal = ds[0, :, :]
         except OSError:
             print('Cannot read GPM file:', self.basename)
             raise

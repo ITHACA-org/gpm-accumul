@@ -1,5 +1,5 @@
 import os
-from ftplib import FTP
+from ftplib import FTP_TLS
 
 from .gpm_wrapper import GPM_FFORMAT
 
@@ -9,7 +9,7 @@ except ImportError:
     print('You must define a user and a password')
 
 
-class GPMFTP(FTP):
+class GPMFTP(FTP_TLS):
 
     GPM_HOST = 'jsimpson.pps.eosdis.nasa.gov'
     HHR_E_dir = '/NRTPUB/imerg/early/'
